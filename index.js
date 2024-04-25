@@ -1,7 +1,7 @@
 const testFolder = "./images/";
 const imageFile = "image-url.json";
 const fs = require("fs");
-const api_key = "";
+const api_key = "YOUR_API_KEY";
 const reqUrl =
   "https://content-vision.googleapis.com/v1/images:annotate?alt=json&key=" +
   api_key;
