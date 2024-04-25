@@ -110,7 +110,6 @@ const prepareData = (data) => {
         }
       },
       getAnswers: (answerString) => {
-        console.log("Input : ",answerString)
         let iAns = [];
         for (let index = 1; index < 13; index++) {
           let str = (answerString.split(index+")")[1].trim()).split(" ")[0];
@@ -126,14 +125,12 @@ const prepareData = (data) => {
     try {
       response.title = input.split("Name:")[0].trim();
       response.name = util.getSubString(input, "Name:", "School:");
-      console.log("Name : ",response.name);
       response.class = util.getSubString(input, "Class:", "Start time:");
       response.date = util.getSubString(input, "Date:", "End Time:");
       response.school = util.getSubString(input, "School:", "1)");
       response.startTime = util.getSubString(input, "Start time:", "Date:");
       response.endTime = util.getSubString(input, "End Time:", "3)");
       response.answers = util.getAnswers(util.getSubString(input, "Final Answers:", "Add"));
-      console.log("ouput : ",response.answers);
       response.sheetCode = "Add_" + util.getSubString(input, "Add_", "1/");
     } catch (error) {}
     return response;
