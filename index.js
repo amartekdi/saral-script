@@ -1,9 +1,9 @@
 const testFolder = "./images/";
 const imageFile = "image-url.json";
+const keyFile = "key.txt"
 const fs = require("fs");
-const api_key = "AIzaSyAjcoaa1Bohwv1qaNwnLU8TLuCN0-v0go0";
-const reqUrl =
-  "https://vision.googleapis.com/v1/images:annotate?alt=json&key=" + api_key;
+let api_key = "";
+const reqUrl = "https://vision.googleapis.com/v1/images:annotate?alt=json&key=";
 const axios = require("axios");
 let imagesUrls = [];
 const util = {
@@ -68,6 +68,8 @@ const util = {
   }
 };
 
+fs.readFile(keyFile, "utf8", function (err, data) {api_key=data});
+
 const prepareRequest = () => {
     fs.readFile(imageFile, "utf8", function (err, data) {
       if (err) throw err;
@@ -84,18 +86,17 @@ const prepareRequest = () => {
       }
       Promise.all(promises).then(async (responses) => {
         let res = responses.flat(1);
-        console.log(res[0].answers);
         console.log("Records received  : ", res.length);
         console.timeEnd("Duration");
-        //saveDataAs("FinalData_", res);
+        saveDataAs("FinalData_", res);
       });
     });
 };
 
 const sendRequst = (reqBody) => {
-  console.log("request sent");
+  console.log("request sent"); 
   return axios
-    .post(reqUrl, {
+    .post(reqUrl+api_key, {
       requests: Array.from(reqBody),
     })
     .then(function (response) {
@@ -107,7 +108,7 @@ const sendRequst = (reqBody) => {
 };
 
 const prepareData = (data) => {
-  console.log("preparing data...");
+  console.log("preparing data ...");
   let newData = data
     .map((response) => {
       try {
@@ -126,7 +127,7 @@ const prepareData = (data) => {
 };
 
 const getArrengedBlocks = (dataArr)=>{
-  console.log("preparing blocks ...");
+  // console.log("preparing blocks ...");
   let blocks = dataArr.map((data)=>{
     let text = data.paragraphs[0].words.map((word)=>{
       return word.symbols.map((symbol)=>{return symbol?.property?.detectedBreak?.type=="SPACE"? symbol.text+" ": symbol.text}).join("")
@@ -156,8 +157,8 @@ return arr;
 
 const getFinalData = (newData)=>{
   console.log("preparing final data ...")
-  return newData.map((iData) => {
-    let response = {};
+  return newData.map((iData,index) => {
+    let response = {id:index+1};
     try {
       let rowArr = iData.map((rows)=>{
         return rows.map((row)=>{ return row.words; }).join(" ");
@@ -174,7 +175,6 @@ const getFinalData = (newData)=>{
       response.answers = [];
       for (let index = iIndex + 1; index < iData.length - 1 ; index++) {
         if(!(JSON.stringify(iData[index])).includes(")"))break;
-        console.log(rowArr[index]);
         let ansArr = [];
         for (let i = 0; i < iData[index].length; i++) {
             let question = 0;
@@ -210,7 +210,7 @@ const saveDataAs = (name, data) => {
     JSON.stringify(data),
     "utf8",
     () => {
-      console.log(name + " file saved successfully.");
+      console.log("File saved successfully.");
     }
   );
 };
